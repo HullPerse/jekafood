@@ -16,14 +16,14 @@ type IconSymbolName = keyof typeof MAPPING;
 const MAPPING = {
   'house.fill': 'home',
   'paperplane.fill': 'send',
-  'chevron.left.forwardslash.chevron.right': 'code',
+  'chevron.left.forwardslash.chevron.right': 'settings',
   'chevron.right': 'chevron-right',
-} as IconMapping;
+  'bookmark': 'bookmark',
+} as any as IconMapping;
 
 /**
- * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
- * This ensures a consistent look across platforms, and optimal resource usage.
- * Icon `name`s are based on SF Symbols and require manual mapping to Material Icons.
+ * An icon component using Material Icons.
+ * Icon `name`s are based on SF Symbols and mapped to Material Icons.
  */
 export function IconSymbol({
   name,
