@@ -1,36 +1,111 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
-import { ThemedView } from "@/components/themed-view";
 import { CalorieGauge } from "@/components/CalorieGauge";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useDataStore } from "@/store/data.store";
+import { ThemedView } from "@/components/themed-view";
+import { Button } from "@react-navigation/elements";
+import { ThemedText } from "@/components/themed-text";
+import { useEffect, useState } from "react";
+import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
 
 export default function HomeScreen() {
+  const { current, goal } = useDataStore((state) => state);
+
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <View style={styles.gaugeContainer}>
-        <CalorieGauge current={30} goal={2000} />
-      </View>
-      <ThemedView style={styles.titleContainer}>1111</ThemedView>
-    </ScrollView>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <ThemedView style={styles.gaugeContainer}>
+        <CalorieGauge current={current} goal={goal} />
+      </ThemedView>
+      <ThemedView
+        style={{
+          backgroundColor: colors.tint,
+          flex: 1,
+          borderTopEndRadius: 40,
+          borderTopStartRadius: 40,
+          marginTop: 30,
+        }}
+      >
+        <View
+          style={{
+            borderBottomColor: colors.background,
+            borderBottomWidth: 2,
+            padding: 10,
+            marginTop: 10,
+            marginBottom: 10,
+            flexDirection: "row",
+            gap: 20,
+            justifyContent: "center",
+          }}
+        >
+          <ThemedText
+            style={{
+              color: colors.background,
+              fontSize: 20,
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            {time.toLocaleDateString([], {
+              timeZone: "Europe/Moscow",
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            })}
+          </ThemedText>
+        </View>
+
+        <View></View>
+
+        <View
+          style={[styles.buttonContainer, { backgroundColor: colors.tint }]}
+        >
+          <Button
+            style={[
+              styles.buttonContainer,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.tint,
+                borderWidth: 2,
+              },
+            ]}
+            color={colors.text}
+          >
+            +
+          </Button>
+        </View>
+      </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   gaugeContainer: {
+    position: "relative",
     alignItems: "center",
-    paddingVertical: 50,
+    paddingTop: 50,
   },
-  titleContainer: {
-    flexDirection: "row",
+  buttonContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    height: 60,
+    width: 60,
     alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+    justifyContent: "center",
+    fontSize: 100,
+    fontWeight: "bold",
+    zIndex: 100,
   },
 });

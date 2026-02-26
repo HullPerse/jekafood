@@ -50,7 +50,6 @@ export function CalorieGauge({
 
   const tintColor = useThemeColor({}, "tint");
 
-  const remaining = Math.max(goal - current, 0);
   const isAtGoal = current === goal;
   const isOverGoal = current > goal;
   const percentage = Math.round((current / goal) * 100);

@@ -77,16 +77,4 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "500",
   },
-  plusButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  plusText: {
-    fontSize: 22,
-    fontWeight: "400",
-    marginTop: -2,
-  },
 });
