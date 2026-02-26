@@ -108,7 +108,12 @@ export function CalorieGauge({
         </Text>
       </View>
 
-      <View style={[styles.percentageBadge, { backgroundColor }]}>
+      <View
+        style={[
+          styles.percentageBadge,
+          { backgroundColor, borderColor: textColor, borderWidth: 1 },
+        ]}
+      >
         <Text style={[styles.percentageText, { color: textColor }]}>
           {percentage}%
         </Text>

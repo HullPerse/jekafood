@@ -8,7 +8,6 @@ import { ThemedView } from "@/components/themed-view";
 import { Button } from "@react-navigation/elements";
 import { ThemedText } from "@/components/themed-text";
 import { useEffect, useState } from "react";
-import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
 
 export default function HomeScreen() {
   const { current, goal } = useDataStore((state) => state);
@@ -75,7 +74,7 @@ export default function HomeScreen() {
             style={[
               styles.buttonContainer,
               {
-                backgroundColor: colors.background,
+                backgroundColor: "#292929",
                 borderColor: colors.tint,
                 borderWidth: 2,
               },

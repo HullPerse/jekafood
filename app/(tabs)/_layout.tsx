@@ -41,9 +41,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="stats"
+        name="history"
         options={{
-          title: "Статы",
+          title: "История",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={24} name="chevron.right" color={color} />
           ),
