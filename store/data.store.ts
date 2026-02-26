@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { persist, subscribeWithSelector } from "zustand/middleware";
+import {
+  createJSONStorage,
+  persist,
+  subscribeWithSelector,
+} from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface DataStore {
   current: number;
@@ -26,6 +31,7 @@ export const useDataStore = create<DataStore>()(
       }),
       {
         name: "data-storage",
+        storage: createJSONStorage(() => AsyncStorage),
       },
     ),
   ),

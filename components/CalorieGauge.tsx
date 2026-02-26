@@ -32,14 +32,23 @@ export function CalorieGauge({
   const center = size / 2;
 
   const progress = useSharedValue(0);
+  const overflow = useSharedValue(0);
 
   useEffect(() => {
     const percentage = Math.min(current / goal, 1);
     progress.value = withSpring(percentage, {
-      damping: 15,
       stiffness: 100,
     });
-  }, [current, goal, progress]);
+
+    if (current > goal) {
+      const overflowPercent = Math.min((current - goal) / goal, 1);
+      overflow.value = withSpring(overflowPercent, {
+        stiffness: 100,
+      });
+    } else {
+      overflow.value = withSpring(0);
+    }
+  }, [current, goal, progress, overflow]);
 
   const animatedProps = useAnimatedProps(() => {
     const strokeDashoffset = circumference * (1 - progress.value);
@@ -48,17 +57,23 @@ export function CalorieGauge({
     };
   });
 
+  const overflowAnimatedProps = useAnimatedProps(() => {
+    const strokeDashoffset = circumference * (1 - overflow.value);
+    return {
+      strokeDashoffset,
+    };
+  });
+
   const tintColor = useThemeColor({}, "tint");
 
-  const isAtGoal = current === goal;
   const isOverGoal = current > goal;
   const percentage = Math.round((current / goal) * 100);
 
   const progressColor = useMemo(() => {
-    if (isAtGoal) return "#22c55e";
-    if (isOverGoal) return "#ef4444";
+    if (current >= goal) return "#77DD77";
+
     return tintColor;
-  }, [isAtGoal, isOverGoal, tintColor]);
+  }, [tintColor, current, goal]);
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
@@ -85,6 +100,21 @@ export function CalorieGauge({
           fill="none"
           transform={`rotate(-90 ${center} ${center})`}
         />
+
+        {isOverGoal && (
+          <AnimatedCircle
+            cx={center}
+            cy={center}
+            r={radius}
+            stroke="#ef4444"
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            animatedProps={overflowAnimatedProps}
+            fill="none"
+            transform={`rotate(-90 ${center} ${center})`}
+          />
+        )}
       </Svg>
 
       <View style={styles.centerContent}>

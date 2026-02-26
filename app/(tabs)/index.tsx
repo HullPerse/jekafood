@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, RefreshControl, ScrollView } from "react-native";
 
 import { CalorieGauge } from "@/components/CalorieGauge";
 import { Colors } from "@/constants/theme";
@@ -10,20 +10,31 @@ import { ThemedText } from "@/components/themed-text";
 import { useEffect, useState } from "react";
 
 export default function HomeScreen() {
-  const { current, goal } = useDataStore((state) => state);
+  const { current, goal, setCurrent } = useDataStore((state) => state);
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
   const [time, setTime] = useState(new Date());
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <ScrollView
+      contentContainerStyle={{ flex: 1, backgroundColor: colors.background }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <ThemedView style={styles.gaugeContainer}>
         <CalorieGauge current={current} goal={goal} />
       </ThemedView>
@@ -65,6 +76,7 @@ export default function HomeScreen() {
           </ThemedText>
         </View>
 
+        <Button onPressOut={() => setCurrent(0)}>REMOVE</Button>
         <View></View>
 
         <View
@@ -80,12 +92,13 @@ export default function HomeScreen() {
               },
             ]}
             color={colors.text}
+            onPressOut={() => setCurrent(current + 200)}
           >
             +
           </Button>
         </View>
       </ThemedView>
-    </View>
+    </ScrollView>
   );
 }
 
