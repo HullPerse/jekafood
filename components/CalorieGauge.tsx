@@ -35,7 +35,8 @@ export function CalorieGauge({
   const overflow = useSharedValue(0);
 
   useEffect(() => {
-    const percentage = Math.min(current / goal, 1);
+    const percentage =
+      current <= 0 ? Math.min(1 / 1000, 1) : Math.min(current / goal, 1);
     progress.value = withSpring(percentage, {
       stiffness: 100,
     });
