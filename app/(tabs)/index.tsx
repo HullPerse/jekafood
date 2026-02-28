@@ -5,7 +5,6 @@ import { CalorieGauge } from "@/components/CalorieGauge";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useDataStore } from "@/store/data.store";
-import { ThemedView } from "@/components/themed-view";
 
 import useDelay from "@/hooks/use-delay";
 import Loader from "@/components/loader";
@@ -18,12 +17,24 @@ export default function HomeScreen() {
 
   const [page, setPage] = useState<number>(0);
   const [current, setCurrent] = useState(0);
+  
+  useEffect(() => {
+    //if new day then reset current
+    const today = new Date().toISOString().split("T")[0];
+    const currentDay = food.filter(
+      (item) => item.date.split("T")[0] === today,
+    );
+
+    if (currentDay.length > 0) {
+      setCurrent(currentDay.reduce((acc, item) => acc + item.calories, 0));
+    }
+  }, [])
 
   useEffect(() => {
     const calculateCurrent = () => {
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
       const currentDay = food.filter(
-        (item) => item.date.split('T')[0] === today,
+        (item) => item.date.split("T")[0] === today,
       );
 
       const current = currentDay.reduce((acc, item) => acc + item.calories, 0);
@@ -47,9 +58,7 @@ export default function HomeScreen() {
   }, [page]);
 
   return (
-    <View
-      style={{ flex: 1, backgroundColor: colors.background }}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.gaugeContainer}>
         <CalorieGauge current={current} goal={goal} />
       </View>

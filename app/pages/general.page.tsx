@@ -110,7 +110,7 @@ function GeneralPage({ setPage }: { setPage: (page: number) => void }) {
             textAlign: "center",
           }}
         >
-          {time.toLocaleDateString([], {
+          {time.toLocaleDateString(["ru-RU"], {
             timeZone: "Europe/Moscow",
             weekday: "short",
             month: "short",
