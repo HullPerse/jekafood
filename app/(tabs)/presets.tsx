@@ -380,22 +380,42 @@ export default function PresetsScreen() {
               Количество (
               {selectedPreset?.valueType === "100g" ? "грамм" : "штук"})
             </ThemedText>
-            <TextInput
-              placeholder={
-                selectedPreset?.valueType === "100g"
-                  ? "Введите граммы"
-                  : "Введите количество"
-              }
-              placeholderTextColor="#666"
-              keyboardType="number-pad"
-              style={[
-                styles.input,
-                { borderColor: colors.text, color: colors.text },
-              ]}
-              value={amountInput}
-              onChangeText={setAmountInput}
-              autoFocus
-            />
+            {selectedPreset?.valueType === "1pc" ? (
+              <View style={styles.clickerContainer}>
+                <TouchableOpacity
+                  style={[styles.clickerButton, { backgroundColor: colors.tint }]}
+                  onPress={() =>
+                    setAmountInput(Math.max(0, Number(amountInput) - 1).toString())
+                  }
+                >
+                  <ThemedText style={[styles.clickerText, { color: colors.background }]}>-</ThemedText>
+                </TouchableOpacity>
+                <ThemedText style={[styles.clickerValue, { color: colors.text }]}>
+                  {amountInput || "0"}
+                </ThemedText>
+                <TouchableOpacity
+                  style={[styles.clickerButton, { backgroundColor: colors.tint }]}
+                  onPress={() =>
+                    setAmountInput(((Number(amountInput) || 0) + 1).toString())
+                  }
+                >
+                  <ThemedText style={[styles.clickerText, { color: colors.background }]}>+</ThemedText>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TextInput
+                placeholder="Введите граммы"
+                placeholderTextColor="#666"
+                keyboardType="number-pad"
+                style={[
+                  styles.input,
+                  { borderColor: colors.text, color: colors.text },
+                ]}
+                value={amountInput}
+                onChangeText={setAmountInput}
+                autoFocus
+              />
+            )}
 
             {amountInput && selectedPreset && (
               <ThemedText
@@ -543,5 +563,29 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
+  },
+  clickerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 16,
+    marginVertical: 8,
+  },
+  clickerButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  clickerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  clickerValue: {
+    fontSize: 32,
+    fontWeight: "bold",
+    minWidth: 60,
+    textAlign: "center",
   },
 });

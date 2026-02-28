@@ -34,7 +34,7 @@ const cards = [
 ];
 
 function AddPage({ setPage }: { setPage: (page: number) => void }) {
-  const { setFood, food } = useDataStore((state) => state);
+  const { setFood, food, presets } = useDataStore((state) => state);
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -42,6 +42,12 @@ function AddPage({ setPage }: { setPage: (page: number) => void }) {
   const [valueInput, setValueInput] = useState("");
   const [caloriesInput, setCaloriesInput] = useState("");
   const [selectedType, setSelectedType] = useState(cards[0].label);
+  const [mode, setMode] = useState<"preset" | "normal">("normal");
+  const [selectedPreset, setSelectedPreset] = useState<
+    (typeof presets)[0] | null
+  >(null);
+
+  const is100g = mode === "preset" && selectedPreset?.valueType === "100g";
 
   return (
     <View style={styles.container}>
@@ -54,37 +60,118 @@ function AddPage({ setPage }: { setPage: (page: number) => void }) {
           X
         </Button>
       </View>
-      <View style={styles.inputRow}>
-        <View style={styles.clickerContainer}>
-          <TouchableOpacity
-            style={styles.clickerButton}
-            onPress={() =>
-              setValueInput(Math.max(0, Number(valueInput) - 1).toString())
-            }
+
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tab, mode === "normal" && styles.tabActive]}
+          onPress={() => {
+            setMode("normal");
+            setSelectedPreset(null);
+            setValueInput("");
+            setSelectedType(cards[0].label);
+          }}
+        >
+          <Text
+            style={[styles.tabText, mode === "normal" && styles.tabTextActive]}
           >
-            <Text style={styles.clickerText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.clickerValue}>{valueInput || "0"}</Text>
-          <TouchableOpacity
-            style={styles.clickerButton}
-            onPress={() =>
-              setValueInput(((Number(valueInput) || 0) + 1).toString())
+            Обычное
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, mode === "preset" && styles.tabActive]}
+          onPress={() => {
+            setMode("preset");
+            if (presets.length > 0) {
+              const firstPreset = presets[0];
+              setSelectedPreset(firstPreset);
+              setSelectedType(firstPreset.label);
+              setCaloriesInput(firstPreset.calories.toString());
+              setValueInput(firstPreset.valueType === "100g" ? "1" : "1");
             }
+          }}
+        >
+          <Text
+            style={[styles.tabText, mode === "preset" && styles.tabTextActive]}
           >
-            <Text style={styles.clickerText}>+</Text>
-          </TouchableOpacity>
-        </View>
+            Пресеты
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.inputRow}>
-        <TextInput
-          placeholder={`Введите ккал`}
-          keyboardType="number-pad"
-          style={styles.textInput}
-          value={caloriesInput}
-          onChangeText={setCaloriesInput}
-        />
-      </View>
+      {mode === "preset" && selectedPreset ? (
+        <View style={styles.presetInputContainer}>
+          <Text style={styles.valueLabel}>
+            {selectedPreset.valueType === "100g" ? "Граммы:" : "Количество:"}
+          </Text>
+          <View style={styles.presetInputRow}>
+            {!is100g ? (
+              <View style={styles.clickerContainer}>
+                <TouchableOpacity
+                  style={styles.clickerButton}
+                  onPress={() =>
+                    setValueInput(
+                      Math.max(0, Number(valueInput) - 1).toString(),
+                    )
+                  }
+                >
+                  <Text style={styles.clickerText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.clickerValue}>{valueInput || "0"}</Text>
+                <TouchableOpacity
+                  style={styles.clickerButton}
+                  onPress={() =>
+                    setValueInput(((Number(valueInput) || 0) + 1).toString())
+                  }
+                >
+                  <Text style={styles.clickerText}>+</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TextInput
+                placeholder="Введите количество"
+                keyboardType="number-pad"
+                style={styles.textInput}
+                value={valueInput}
+                onChangeText={setValueInput}
+              />
+            )}
+          </View>
+        </View>
+      ) : (
+        <View style={styles.inputRow}>
+          <View style={styles.clickerContainer}>
+            <TouchableOpacity
+              style={styles.clickerButton}
+              onPress={() =>
+                setValueInput(Math.max(0, Number(valueInput) - 1).toString())
+              }
+            >
+              <Text style={styles.clickerText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.clickerValue}>{valueInput || "0"}</Text>
+            <TouchableOpacity
+              style={styles.clickerButton}
+              onPress={() =>
+                setValueInput(((Number(valueInput) || 0) + 1).toString())
+              }
+            >
+              <Text style={styles.clickerText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {mode !== "preset" && (
+        <View style={styles.inputRow}>
+          <TextInput
+            placeholder={`Введите ккал`}
+            keyboardType="number-pad"
+            style={styles.textInput}
+            value={caloriesInput}
+            onChangeText={setCaloriesInput}
+          />
+        </View>
+      )}
 
       <ScrollView
         style={styles.scrollView}
@@ -92,30 +179,66 @@ function AddPage({ setPage }: { setPage: (page: number) => void }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.cardsContainer}>
-          {cards.map((card) => (
-            <TouchableOpacity
-              key={card.label}
-              style={[
-                styles.card,
-                selectedType === card.label && styles.cardSelected,
-              ]}
-              onPress={() => setSelectedType(card.label)}
-            >
-              <MaterialIcons
-                name={card.icon as any}
-                size={38}
-                color={selectedType === card.label ? "#fff" : "#666"}
-              />
-              <Text
+          {mode === "preset"
+            ? presets.map((preset) => (
+                <TouchableOpacity
+                  key={preset.id}
+                  style={[
+                    styles.card,
+                    selectedType === preset.label && styles.cardSelected,
+                  ]}
+                  onPress={() => {
+                    setSelectedPreset(preset);
+                    setSelectedType(preset.label);
+                    setCaloriesInput(preset.calories.toString());
+                    setValueInput(preset.valueType === "100g" ? "1" : "1");
+                  }}
+                >
+                  <MaterialIcons
+                    name={preset.icon as any}
+                    size={38}
+                    color={selectedType === preset.label ? "#fff" : "#666"}
+                  />
+                  <Text
+                    style={[
+                      styles.cardLabel,
+                      selectedType === preset.label && styles.cardLabelSelected,
+                    ]}
+                  >
+                    {preset.label}
+                  </Text>
+                  <Text style={styles.cardCalories}>
+                    {preset.calories}
+                    {preset.valueType === "100g" ? "/100г" : "/шт"}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            : null}
+          {(mode === "normal" || presets.length === 0) &&
+            cards.map((card) => (
+              <TouchableOpacity
+                key={card.label}
                 style={[
-                  styles.cardLabel,
-                  selectedType === card.label && styles.cardLabelSelected,
+                  styles.card,
+                  selectedType === card.label && styles.cardSelected,
                 ]}
+                onPress={() => setSelectedType(card.label)}
               >
-                {card.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <MaterialIcons
+                  name={card.icon as any}
+                  size={38}
+                  color={selectedType === card.label ? "#fff" : "#666"}
+                />
+                <Text
+                  style={[
+                    styles.cardLabel,
+                    selectedType === card.label && styles.cardLabelSelected,
+                  ]}
+                >
+                  {card.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
         </View>
       </ScrollView>
 
@@ -136,9 +259,15 @@ function AddPage({ setPage }: { setPage: (page: number) => void }) {
               color={isDisabled ? "#666" : colors.text}
               disabled={isDisabled}
               onPressOut={() => {
+                const multiplier = is100g
+                  ? Number(valueInput)
+                  : Number(valueInput);
+                const totalCalories = Math.round(
+                  Number(caloriesInput) * multiplier,
+                );
                 const data: Food = {
                   date: new Date().toISOString(),
-                  calories: Number(caloriesInput) * Number(valueInput),
+                  calories: totalCalories,
                   type: selectedType,
                 };
 
@@ -146,7 +275,13 @@ function AddPage({ setPage }: { setPage: (page: number) => void }) {
                 setPage(0);
               }}
             >
-              {`ДОБАВИТЬ ` + (Number(caloriesInput) * Number(valueInput) || 0)}
+              {`ДОБАВИТЬ ` +
+                (() => {
+                  const multiplier = is100g
+                    ? Number(valueInput)
+                    : Number(valueInput);
+                  return Math.round(Number(caloriesInput) * multiplier || 0);
+                })()}
             </Button>
           );
         })()}
@@ -212,6 +347,22 @@ const styles = StyleSheet.create({
     minWidth: 60,
     textAlign: "center",
   },
+  valueLabel: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  presetInputContainer: {
+    width: "100%",
+    alignItems: "center",
+    paddingVertical: 20,
+    gap: 12,
+  },
+  presetInputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   cardsContainer: {
     flexDirection: "row",
     paddingHorizontal: 20,
@@ -219,6 +370,35 @@ const styles = StyleSheet.create({
     gap: 20,
     flexWrap: "wrap",
     justifyContent: "center",
+  },
+  tabsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingTop: 70,
+    paddingHorizontal: 20,
+    gap: 10,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    backgroundColor: "#333",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  tabActive: {
+    backgroundColor: "#4CAF50",
+  },
+  tabText: {
+    color: "#888",
+    fontWeight: "600",
+  },
+  tabTextActive: {
+    color: "#fff",
+  },
+  cardCalories: {
+    fontSize: 10,
+    color: "#888",
+    marginTop: 2,
   },
   closeButtonContainer: {
     position: "absolute",

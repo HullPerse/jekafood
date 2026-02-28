@@ -5,6 +5,7 @@ import { CalorieGauge } from "@/components/CalorieGauge";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useDataStore } from "@/store/data.store";
+import { useIsFocused } from "@react-navigation/native";
 
 import useDelay from "@/hooks/use-delay";
 import Loader from "@/components/loader";
@@ -17,6 +18,14 @@ export default function HomeScreen() {
 
   const [page, setPage] = useState<number>(0);
   const [current, setCurrent] = useState(0);
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      setPage(0);
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
