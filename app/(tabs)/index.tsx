@@ -1,5 +1,5 @@
-import { lazy, Suspense, useCallback, useState } from "react";
-import { StyleSheet, RefreshControl, ScrollView } from "react-native";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { StyleSheet, ScrollView } from "react-native";
 
 import { CalorieGauge } from "@/components/CalorieGauge";
 import { Colors } from "@/constants/theme";
@@ -14,32 +14,28 @@ const GeneralPage = lazy(() => useDelay(import("../pages/general.page"), 500));
 const AddPage = lazy(() => useDelay(import("../pages/add.page"), 500));
 
 export default function HomeScreen() {
-  const { current, goal, food } = useDataStore((state) => state);
+  const { goal, food } = useDataStore((state) => state);
 
   const [page, setPage] = useState<number>(0);
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const calculateCurrent = () => {
+      const today = new Date().toISOString().split('T')[0];
+      const currentDay = food.filter(
+        (item) => item.date.split('T')[0] === today,
+      );
+
+      const current = currentDay.reduce((acc, item) => acc + item.calories, 0);
+
+      return current;
+    };
+
+    setCurrent(calculateCurrent());
+  }, [food]);
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  };
-
-  const calculateCurrent = () => {
-    //get array of all calories for current new Date
-    const currentDay = food.filter(
-      (item) => item.date === new Date().toISOString(),
-    );
-
-    //get the calories for the current day
-    const current = currentDay.reduce((acc, item) => acc + item.calories, 0);
-
-    //sum them up
-    return current;
-  };
 
   const getPage = useCallback(() => {
     const pageMap = {
@@ -53,12 +49,9 @@ export default function HomeScreen() {
   return (
     <ScrollView
       contentContainerStyle={{ flex: 1, backgroundColor: colors.background }}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
     >
       <ThemedView style={styles.gaugeContainer}>
-        <CalorieGauge current={calculateCurrent()} goal={goal} />
+        <CalorieGauge current={current} goal={goal} />
       </ThemedView>
       <ThemedView
         style={{

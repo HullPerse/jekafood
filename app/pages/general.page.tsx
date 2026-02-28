@@ -8,7 +8,7 @@ import { memo, useEffect, useState } from "react";
 import { useDataStore } from "@/store/data.store";
 
 function GeneralPage({ setPage }: { setPage: (page: number) => void }) {
-  const { setCurrent } = useDataStore((state) => state);
+  const { setFood } = useDataStore((state) => state);
 
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -51,7 +51,7 @@ function GeneralPage({ setPage }: { setPage: (page: number) => void }) {
         </ThemedText>
       </View>
 
-      <Button onPressOut={() => setCurrent(0)}>REMOVE</Button>
+      <Button onPressOut={() => setFood([])}>REMOVE</Button>
 
       <View></View>
 
