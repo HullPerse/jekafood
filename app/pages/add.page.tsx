@@ -10,7 +10,6 @@ import {
 import { Button } from "@react-navigation/elements";
 import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { Colors } from "@/constants/theme";
-import { Select, SelectItem } from "@/components/select";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Food, useDataStore } from "@/store/data.store";
 
@@ -21,7 +20,7 @@ const cards = [
   { label: "Перекус", icon: "cookie" },
   { label: "Сладкое", icon: "cake" },
   { label: "Овощи", icon: "eco" },
-  { label: "Фрукты", icon: "nutrition" },
+  { label: "Фрукты", icon: "spa" },
   { label: "Мясо", icon: "lunch-dining" },
   { label: "Рыба и морепродукты", icon: "set-meal" },
   { label: "Молочные продукты", icon: "local-drink" },
@@ -40,7 +39,6 @@ function AddPage({ setPage }: { setPage: (page: number) => void }) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
-  const [value, setValue] = useState("100g");
   const [valueInput, setValueInput] = useState("");
   const [caloriesInput, setCaloriesInput] = useState("");
   const [selectedType, setSelectedType] = useState(cards[0].label);
@@ -80,16 +78,12 @@ function AddPage({ setPage }: { setPage: (page: number) => void }) {
 
       <View style={styles.inputRow}>
         <TextInput
-          placeholder={`Введите ккал за ${value}`}
+          placeholder={`Введите ккал`}
           keyboardType="number-pad"
           style={styles.textInput}
           value={caloriesInput}
           onChangeText={setCaloriesInput}
         />
-        <Select value={value} onValueChange={setValue}>
-          <SelectItem label="за 100 грамм" value="100g" />
-          <SelectItem label="за 1 штуку" value="1pc" />
-        </Select>
       </View>
 
       <ScrollView
@@ -188,7 +182,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   textInput: {
-    width: 300,
+    width: "100%",
     borderBottomColor: "#333",
     borderBottomWidth: 1,
     textAlign: "center",

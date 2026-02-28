@@ -15,7 +15,7 @@ const cards = [
   { label: "Перекус", icon: "cookie" },
   { label: "Сладкое", icon: "cake" },
   { label: "Овощи", icon: "eco" },
-  { label: "Фрукты", icon: "nutrition" },
+  { label: "Фрукты", icon: "spa" },
   { label: "Мясо", icon: "lunch-dining" },
   { label: "Рыба и морепродукты", icon: "set-meal" },
   { label: "Молочные продукты", icon: "local-drink" },
