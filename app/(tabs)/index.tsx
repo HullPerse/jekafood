@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
-import { StyleSheet, ScrollView } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { CalorieGauge } from "@/components/CalorieGauge";
 import { Colors } from "@/constants/theme";
@@ -47,13 +47,13 @@ export default function HomeScreen() {
   }, [page]);
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flex: 1, backgroundColor: colors.background }}
+    <View
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
-      <ThemedView style={styles.gaugeContainer}>
+      <View style={styles.gaugeContainer}>
         <CalorieGauge current={current} goal={goal} />
-      </ThemedView>
-      <ThemedView
+      </View>
+      <View
         style={{
           backgroundColor: colors.tint,
           flex: 1,
@@ -76,8 +76,8 @@ export default function HomeScreen() {
         >
           {getPage()}
         </Suspense>
-      </ThemedView>
-    </ScrollView>
+      </View>
+    </View>
   );
 }
 

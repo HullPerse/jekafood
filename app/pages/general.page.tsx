@@ -1,6 +1,6 @@
 import { Button } from "@react-navigation/elements";
 import { ThemedText } from "@/components/themed-text";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -25,10 +25,10 @@ const cards = [
 
 function getIconForType(type: string) {
   const card = cards.find((c) => c.label === type);
-  return card?.icon as keyof typeof MaterialIcons.glyphMap ?? "restaurant";
+  return (card?.icon as keyof typeof MaterialIcons.glyphMap) ?? "restaurant";
 }
 
-function FoodItem({ item }: { item: Food }) {
+function FoodItem({ item, onDelete }: { item: Food; onDelete: () => void }) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
@@ -68,6 +68,9 @@ function FoodItem({ item }: { item: Food }) {
       >
         {item.calories} ккал
       </ThemedText>
+      <TouchableOpacity onPress={onDelete} style={{ padding: 4 }}>
+        <MaterialIcons name="delete" size={24} color={colors.background} />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -116,12 +119,19 @@ function GeneralPage({ setPage }: { setPage: (page: number) => void }) {
         </ThemedText>
       </View>
 
-      <Button onPressOut={() => setFood([])}>REMOVE</Button>
-
       <FlatList
         data={food}
         keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => <FoodItem item={item} />}
+        renderItem={({ item, index }) => (
+          <FoodItem
+            item={item}
+            onDelete={() => {
+              const newFood = [...food];
+              newFood.splice(index, 1);
+              setFood(newFood);
+            }}
+          />
+        )}
         contentContainerStyle={{ paddingBottom: 80 }}
       />
 
