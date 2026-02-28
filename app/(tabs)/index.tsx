@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { lazy, Suspense, useCallback, useState } from "react";
 import { StyleSheet, RefreshControl, ScrollView } from "react-native";
 
 import { CalorieGauge } from "@/components/CalorieGauge";
@@ -6,8 +6,12 @@ import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useDataStore } from "@/store/data.store";
 import { ThemedView } from "@/components/themed-view";
-import GeneralPage from "../pages/general.page";
-import AddPage from "../pages/add.page";
+
+import useDelay from "@/hooks/use-delay";
+import Loader from "@/components/loader";
+
+const GeneralPage = lazy(() => useDelay(import("../pages/general.page"), 500));
+const AddPage = lazy(() => useDelay(import("../pages/add.page"), 500));
 
 export default function HomeScreen() {
   const { current, goal } = useDataStore((state) => state);
@@ -59,7 +63,20 @@ export default function HomeScreen() {
           marginTop: 30,
         }}
       >
-        {getPage()}
+        <Suspense
+          fallback={
+            <Loader
+              size={256}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
+              color={colors.background}
+            />
+          }
+        >
+          {getPage()}
+        </Suspense>
       </ThemedView>
     </ScrollView>
   );
