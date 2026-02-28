@@ -205,6 +205,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 30,
   },
   calendar: {
     borderBottomWidth: 1,
