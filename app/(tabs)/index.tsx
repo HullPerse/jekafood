@@ -14,7 +14,7 @@ const GeneralPage = lazy(() => useDelay(import("../pages/general.page"), 500));
 const AddPage = lazy(() => useDelay(import("../pages/add.page"), 500));
 
 export default function HomeScreen() {
-  const { current, goal } = useDataStore((state) => state);
+  const { current, goal, food } = useDataStore((state) => state);
 
   const [page, setPage] = useState<number>(0);
 
@@ -30,8 +30,14 @@ export default function HomeScreen() {
 
   const calculateCurrent = () => {
     //get array of all calories for current new Date
-    //sum them up
+    const currentDay = food.filter(
+      (item) => item.date === new Date().toISOString(),
+    );
 
+    //get the calories for the current day
+    const current = currentDay.reduce((acc, item) => acc + item.calories, 0);
+
+    //sum them up
     return current;
   };
 
